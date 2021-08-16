@@ -229,6 +229,7 @@ public class Migracion2 extends javax.swing.JInternalFrame {
         canciones.add("FORMATO");
         canciones.add("FORMATOV");
         canciones.add("NIVELES");
+        canciones.add("NIVELESLEVEL1");
         canciones.add("PAGO");
         canciones.add("PERMISO");
         canciones.add("PRESENTACION");
@@ -843,6 +844,18 @@ public class Migracion2 extends javax.swing.JInternalFrame {
                             JOptionPane.showMessageDialog(null, ex, "Error en NIVELES "+ex.getMessage(), JOptionPane.ERROR_MESSAGE);                
                         }                        
                     break;
+                    case"NIVELESLEVEL1":
+                        try {
+                            Connection con = ConexionDes.GetConnection();
+                            PreparedStatement psql=con.prepareStatement("DELETE FROM "+Conexion.conexiondesvar+".dbo.NIVELESLEVEL1\n" +
+                            "Insert Into "+Conexion.conexiondesvar+".dbo.NIVELESLEVEL1 (NivId,PrgId,NivPrgAlt,NivPrgBaj,NivPrgMod,NivPrgCon)\n" +
+                            "select NivId,PrgId,NivPrgAlt,NivPrgBaj,NivPrgMod,NivPrgCon from "+Conexion.conexionorivar+".dbo.NIVELESLEVEL1");                              
+                            psql.execute();
+                            psql.close();
+                        } catch (Exception ex) {
+                            JOptionPane.showMessageDialog(null, ex, "Error en NIVELESLEVEL1 "+ex.getMessage(), JOptionPane.ERROR_MESSAGE);                
+                        }                        
+                    break;                    
                     case"PAGO":
                         try {
                             Connection con = ConexionDes.GetConnection();

@@ -755,9 +755,14 @@ private void Migracion(){
                 Connection con = ConexionDes.GetConnection();
                 PreparedStatement psql=con.prepareStatement("DELETE FROM "+Conexion.conexiondesvar+".dbo.GENAUX\n" +
                 "SET IDENTITY_INSERT GENAUX ON\n" +
-                "Insert Into "+Conexion.conexiondesvar+".dbo.GENAUX (GenAuxId,GenAuxSuc,GenAuxCen,GenAuxCta,GenAuxFec,GenAuxDeb,GenAuxHab,GenAuxCam,GenAuxImp,GenAuxiliar,GenAuxDet,GenAuxprv,GenAuxestret,GenAuxfecven)\n" +
-                "select GenAuxId,GenAuxSuc,GenAuxCen,GenAuxCta,GenAuxFec,GenAuxDeb,GenAuxHab,GenAuxCam,GenAuxImp,GenAuxiliar,GenAuxDet,GenAuxprv,GenAuxestret,GenAuxfecven from "+Conexion.conexionorivar+".dbo.GENAUX\n" +
-                "SET IDENTITY_INSERT GENAUX  OFF");
+                "Insert Into "+Conexion.conexiondesvar+".dbo.GENAUX (GenAuxId,GenAuxSuc,GenAuxCen,GenAuxCta,GenAuxFec,GenAuxDeb,GenAuxHab,GenAuxCam,GenAuxImp,GenAuxiliar,GenAuxDet,GenAuxprv,GenAuxestret,GenAuxfecven,GenAuxNegId,GenAuxCmpRet)\n" +
+                "select GenAuxId,GenAuxSuc,GenAuxCen,GenAuxCta,GenAuxFec,GenAuxDeb,GenAuxHab,GenAuxCam,GenAuxImp,GenAuxiliar,GenAuxDet,GenAuxprv,GenAuxestret,GenAuxfecven,0,0 from "+Conexion.conexionorivar+".dbo.GENAUX\n" +
+                "SET IDENTITY_INSERT GENAUX  OFF\n" +
+                "Update GA\n" +
+                "Set GA.GenAuxCuotaId = CP.ComCuoPagId\n" +
+                "From GENAUX As GA\n" +
+                "Inner Join CANCUOPAGLEVEL1 As CPDet On GA.GenAuxDet = CPDet.ComCuoPagCmp And GA.GenAuxSuc = CPDet.ComCuoPagTipFac\n" +
+                "Inner join CANCUOPAG As CP On CPDet.ComCuoPagId = CP.ComCuoPagId And CP.SucEmp = GA.GenAuxCta");
                 psql.execute();
                 psql.close();
                 cargagriddes();
