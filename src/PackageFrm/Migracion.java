@@ -609,7 +609,7 @@ private void Migracion(){
                 Connection con = ConexionDes.GetConnection();
                 PreparedStatement psql=con.prepareStatement("DELETE FROM "+Conexion.conexiondesvar+".dbo.CLIENTE\n" +
                 "Insert Into "+Conexion.conexiondesvar+".dbo.CLIENTE (CliId,CliEmp,CliRuc,CliUsr,CliNom,CliDir,CliTel,CliMail,CliTim,CliFecIng,CliCtaml,CliSuc,CliMon,CliCtaME,CliCtaExe,CliCtaGra,CliCtaGra05,CliObs,CliRetIva,CliRetRen,CliTip,CliMisDiplo)\n" +
-                "select CliId,CliEmp,CliRuc,CliUsr,CliNom,CliDir,CliTel,CliMail,CliTim,CliFecIng,CliCtaml,CliSuc,CliMon,CliCtaME,CliCtaExe,CliCtaGra,CliCtaGra05,CliObs,CliRetIva,CliRetRen,CliTipIden,CliMisDiplo from "+Conexion.conexionorivar+".dbo.CLIENTE");
+                "select CliId,CliEmp,CliRuc,CliUsr,CliNom,CliDir,CliTel,CliMail,CliTim,CliFecIng,CliCtaml,CliSuc, Case When CliMon = '.' Then '' Else CliMon End as CliMon,CliCtaME,CliCtaExe,CliCtaGra,CliCtaGra05,CliObs,CliRetIva,CliRetRen,CliTipIden,CliMisDiplo from "+Conexion.conexionorivar+".dbo.CLIENTE");
                 psql.execute();
                 psql.close();
                 cargagriddes();
@@ -755,8 +755,8 @@ private void Migracion(){
                 Connection con = ConexionDes.GetConnection();
                 PreparedStatement psql=con.prepareStatement("DELETE FROM "+Conexion.conexiondesvar+".dbo.GENAUX\n" +
                 "SET IDENTITY_INSERT GENAUX ON\n" +
-                "Insert Into "+Conexion.conexiondesvar+".dbo.GENAUX (GenAuxId,GenAuxSuc,GenAuxCen,GenAuxCta,GenAuxFec,GenAuxDeb,GenAuxHab,GenAuxCam,GenAuxImp,GenAuxiliar,GenAuxDet,GenAuxprv,GenAuxestret,GenAuxfecven,GenAuxNegId,GenAuxCmpRet)\n" +
-                "select GenAuxId,GenAuxSuc,GenAuxCen,GenAuxCta,GenAuxFec,GenAuxDeb,GenAuxHab,GenAuxCam,GenAuxImp,GenAuxiliar,GenAuxDet,GenAuxprv,GenAuxestret,GenAuxfecven,0,0 from "+Conexion.conexionorivar+".dbo.GENAUX\n" +
+                "Insert Into "+Conexion.conexiondesvar+".dbo.GENAUX (GenAuxId,GenAuxSuc,GenAuxCen,GenAuxCta,GenAuxFec,GenAuxDeb,GenAuxHab,GenAuxCam,GenAuxImp,GenAuxiliar,GenAuxDet,GenAuxprv,GenAuxestret,GenAuxfecven,GenAuxNegId,GenAuxCmpRet,GenAuxNroIden,GenAuxNroLin)\n" +
+                "select GenAuxId,GenAuxSuc,GenAuxCen,GenAuxCta,GenAuxFec,GenAuxDeb,GenAuxHab,GenAuxCam,GenAuxImp,GenAuxiliar,GenAuxDet,GenAuxprv,GenAuxestret,GenAuxfecven,0,0,0,0 from "+Conexion.conexionorivar+".dbo.GENAUX\n" +
                 "SET IDENTITY_INSERT GENAUX  OFF\n" +
                 "Update GA\n" +
                 "Set GA.GenAuxCuotaId = CP.ComCuoPagId\n" +

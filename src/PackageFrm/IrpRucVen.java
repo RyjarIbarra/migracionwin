@@ -5,6 +5,7 @@
  */
 package PackageFrm;
 
+import Conexion.Conexion;
 import Conexion.ConexionDes;
 import Conexion.ConexionOri;
 import java.awt.BorderLayout;
@@ -51,6 +52,7 @@ public class IrpRucVen extends javax.swing.JInternalFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
         jButton2 = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
 
         setClosable(true);
         setTitle("RucVen IRP");
@@ -64,19 +66,18 @@ public class IrpRucVen extends javax.swing.JInternalFrame {
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null}
+                {null},
+                {null},
+                {null},
+                {null}
             },
             new String [] {
-                "Proceso", "Cantidad de Registros"
+                "Proceso"
             }
         ));
         jScrollPane1.setViewportView(jTable1);
         if (jTable1.getColumnModel().getColumnCount() > 0) {
             jTable1.getColumnModel().getColumn(0).setPreferredWidth(500);
-            jTable1.getColumnModel().getColumn(1).setPreferredWidth(100);
         }
 
         jButton2.setText("Migrar Cobros y Generar Cuotas");
@@ -86,18 +87,28 @@ public class IrpRucVen extends javax.swing.JInternalFrame {
             }
         });
 
+        jButton3.setText("Migrar Ganancia de Capital");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 222, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton2)
-                .addContainerGap(327, Short.MAX_VALUE))
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jScrollPane1)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 222, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 206, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton2)
+                        .addGap(0, 109, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -106,10 +117,11 @@ public class IrpRucVen extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton1)
-                    .addComponent(jButton2))
+                    .addComponent(jButton2)
+                    .addComponent(jButton3))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 172, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(78, Short.MAX_VALUE))
+                .addContainerGap(18, Short.MAX_VALUE))
         );
 
         pack();
@@ -125,7 +137,6 @@ public class IrpRucVen extends javax.swing.JInternalFrame {
         try {
              Vector v = new Vector();
              v.add(Proceso);
-             v.add(selectcount);
              modelo.addRow(v);
              jTable1.setModel(modelo);
              ScrollPane = new JScrollPane(table);
@@ -140,439 +151,178 @@ public class IrpRucVen extends javax.swing.JInternalFrame {
         Proceso = "Actualizar Facturas de RucVen (IRP)";
         int nRucVenTipIng = 0;
         try {
-            Connection con = ConexionOri.GetConnection();
-            java.sql.Statement cm=con.createStatement();
-            ResultSet rs= cm.executeQuery("SELECT RucVenTipVenId,RucVenTipEmp,RucVenTipVen,RucVenTipOtr,\n" +
-            "RucVenTipVen2,RucVenTipNoEnv,RucVenTipExe,RucVenTipGra,RucVenTipVen3\n" +
-            "FROM RUCVEN AS RV\n" +
-            "INNER JOIN RUCVENTIP AS RT ON RT.RucVenTipVenId = RV.RucVenId and RT.RucVenTipEmp = RV.RucVenEmp");
-            while(rs.next()){
-                selectcount++;
-                //irp v2
-                if(rs.getInt("RucVenTipVen2")==0 && rs.getInt("RucVenTipVen3")==0) {
-                    switch(rs.getInt("RucVenTipVen")){
-                    case 3:
-                        nRucVenTipIng=4;    
-                        break; 
-                    case 0:
-                        nRucVenTipIng=1;    
-                        break;
-                    case 1:
-                        nRucVenTipIng=2;    
-                        break;
-                    case 2:
-                        nRucVenTipIng=3;    
-                        break;                    
-                }
-                }else{
-                    if(rs.getInt("RucVenTipVen3")==0){//irp v3
-                        nRucVenTipIng=rs.getInt("RucVenTipVen2");
-                    }else {//irp v3 actualizado
-                        nRucVenTipIng=rs.getInt("RucVenTipVen3");
-                    }
-                    
-                }                
-                Connection con2 = ConexionDes.GetConnection();                 
-                java.sql.Statement cm2 = con2.createStatement(); 
-                String RucVenTipEmp = rs.getString("RucVenTipEmp").replace(" ","");
-                PreparedStatement query = con2.prepareStatement("UPDATE RucVen set RucVenTipIng= '"+nRucVenTipIng+" ',RucVenIrpRub= ' "+rs.getInt("RucVenTipOtr")+" ',RucVenNoGraIrp= ' "+rs.getInt("RucVenTipExe")+ " ' WHERE RucVenEmp= '" + RucVenTipEmp + "' and RucVenId = '" + rs.getInt("RucVenTipVenId") + "'");
-                query.execute();
-            }
+                Connection con = ConexionDes.GetConnection();
+                PreparedStatement psql=con.prepareStatement("Update RV\n" +
+                "Set RV.RucVenTipIng =\n" +
+                "Case When RucvenTipRub515 = 30 OR RucvenTipRub515 = 31 Then \n" +
+                "    RucvenTipRub515\n" +
+                "Else \n" +
+                "	Case When RT.RucVenTipVen2 = 0 And RT.RucVenTipVen3 = 0 Then\n" +
+                "	  Case When RT.RucVenTipVen = 3 Then 4\n" +
+                "		   When RT.RucVenTipVen = 0 Then 1\n" +
+                "		   When RT.RucVenTipVen = 1 Then 2\n" +
+                "		   When RT.RucVenTipVen = 2 Then 3\n" +
+                "	  End\n" +
+                "	Else\n" +
+                "	  Case When RT.RucVenTipVen3 = 0 Then\n" +
+                "		  RT.RucVenTipVen2\n" +
+                "	  Else\n" +
+                "		  RT.RucVenTipVen3\n" +
+                "	  End\n" +
+                "	End\n" +
+                " End\n" +
+                ",RucVenIrpRub = RucVenTipOtr, RucVenNoGraIrp = RucVenTipExe\n" +
+                "FROM "+Conexion.conexiondesvar+".dbo.RUCVEN AS RV\n" +
+                "INNER JOIN "+Conexion.conexionorivar+".dbo.RUCVENTIP AS RT ON RT.RucVenTipVenId = RV.RucVenId and RT.RucVenTipEmp = RV.RucVenEmp");
+                psql.execute();
+                psql.close();
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(null, ex, "Error"+ex.getMessage(), JOptionPane.ERROR_MESSAGE);
+            Proceso = "Problemas en el Proceso. Actualizacion no Realizada";
         }
         CargarGrid();
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        int Proceso1CuotasCobro = 0;
-        int Proceso2CuotasCobroLevel = 0;
-        int Proceso3CobroCuota = 0;
-        int Proceso4GenAuxCom = 0;
-        //Girlsway Brandi Love & Nicole Aniston's Lesbian Power Play!
+        Proceso = "Migracion de Cobros y Generacion de Cuotas Realizada Con Exito";
         try {
-            SimpleDateFormat formato = new SimpleDateFormat("yyyy/MM/dd");
-            String fcha = "2020/01/01";
-            Date date = formato.parse(fcha);            
-            formato.applyPattern("yyyy-MM-dd");
-            String nuevoFormato = formato.format(date);
-            Date date2 = formato.parse(nuevoFormato);
-            System.out.println(date2);
-            Connection con = ConexionOri.GetConnection();
-            java.sql.Statement cm=con.createStatement();
-            ResultSet rs= cm.executeQuery("SELECT RucVenCanCuo,RucVenId, SucId, SucEmp, CliId, CliEmp, RucVenUsr, RucVenEmp, RucVenCenCos, RucVenTot, RucVenFec, \n" +
-            "RucVenPriVen, RucVenTipCmp, RucVenCam, RucVenImp, RucVenMon, RucVenNoFac, TotalRecibo , ReciboNro, ReciboFec, \n" +
-            "ReciboImp, ReciboCam, ReciboImpMe, ReciboMon, ReciboObs, ReciboUsr \n" +
-            "FROM RUCVEN AS A \n" +
-            "LEFT JOIN (SELECT ReciboNro, ReciboFec, ReciboImp, ReciboCam, ReciboImpMe, ReciboMon, ReciboObs, \n" +
-            "ReciboUsr,ReciboRucVenId, Sum(ReciboImp) as TotalRecibo \n" +
-            "FROM RECIBO GROUP BY ReciboRucVenId,ReciboEmp,ReciboNro,ReciboFec,ReciboImp,ReciboCam,\n" +
-            "ReciboImpMe,ReciboMon,ReciboObs,ReciboUsr) AS B ON B.ReciboRucVenId = A.RucVenId \n" +
-            "Where RucVenFmaPgo = 2 And RucVenCanCuo > 0"); 
-            int CanCuota = 0;
-            long Importe = 0;
-            long ImporteMe = 0;
-            long ImporteCuota = 0;
-            long ImporteCuotaMe = 0;
-            long ImporteReciboRuc = 0;
-            long ImporteAjus = 0;
-            //new
-            long CuotaCobroSaldoCuo = 0; 
-            long CuotaCobroSaldo = 0;
-            long CuotaCobroImp = 0;
-            double CuotaCobroImpME = 0.0;
-            double CuotaCobroAju = 0.0;
-            double CuotaCobroSalImpMe = 0.0;
-            //new
-            long IdUsar = 0;
-            int IdUsarCobro = 0;
-            Date Fecha;            
-            while(rs.next()){
-                Connection con2 = ConexionDes.GetConnection(); 
-                java.sql.Statement cm2 = con2.createStatement();
-                PreparedStatement stm = con2.prepareStatement("INSERT INTO CUOTASCOBRO (CuotaCobroUltNro, CuotaCobroNroAnt, CuotaCobroRucVenId, CuotaCobroAntId, SucId, SucEmp, CliId, CliEmp, CuotaCobroUsr, CuotaCobroEmp, CuotaCobroCentro, CuotaCobroIdRecha, CuotaCobroPorCom, CuotaCobroSuc, CuotaCobroRecId, CobroCobId, CuotaCobroZona, CuotaCobroVenId, CuotaCobroFacId) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-                stm.setInt(1, rs.getInt("RucVenCanCuo"));
-                stm.setInt(2, 0);
-                stm.setInt(3, rs.getInt("RucVenId"));
-                stm.setInt(4, 0);
-                stm.setString(5, rs.getString("SucId"));
-                stm.setString(6, rs.getString("SucEmp"));
-                stm.setInt(7, rs.getInt("CliId"));
-                stm.setString(8, rs.getString("CliEmp"));
-                stm.setInt(9, rs.getInt("RucVenUsr"));
-                stm.setString(10, rs.getString("RucVenEmp"));
-                stm.setString(11, rs.getString("RucVenCenCos"));
-                stm.setInt(12, 0);
-                stm.setInt(13, 0);
-                stm.setString(14, "");
-                stm.setInt(15, 0);
-                stm.setString(16, "");
-                stm.setString(17, "");
-                stm.setString(18, "");
-                stm.setInt(19, 0);
-                stm.execute();
-                Proceso1CuotasCobro ++;
-                CanCuota = rs.getInt("RucVenCanCuo");               
-                Fecha = rs.getDate("RucVenPriVen");
-                Connection con3 = ConexionDes.GetConnection(); 
-                java.sql.Statement cm3 = con3.createStatement();
-                ResultSet rs2= cm3.executeQuery("SELECT MAX(CuotaCobroId) AS IdUsar FROM CUOTASCOBRO");
-                while (rs2.next()) {
-                    IdUsar = rs2.getLong("IdUsar");                    
-                }                
-                Calendar calendario = Calendar.getInstance();
-                calendario.setTime(Fecha);
-                int anio = calendario.get(Calendar.YEAR);
-                int mes = calendario.get(Calendar.MONTH);
-                int dia = calendario.get(Calendar.DAY_OF_MONTH);//getActualMaximum(Calendar.DAY_OF_MONTH)
-                LocalDateTime locaDate = LocalDateTime.now();
-                int hours  = locaDate.getHour();
-                int minutes = locaDate.getMinute();
-                int seconds = locaDate.getSecond();
-                int Ban = 0;
-                int Ban2 = 0;
-                Date Fecha4 = null;
-                String Fecha2 = anio + "-" + mes + "-" + dia;
-                SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd");
-                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-                Date fecha1 = ft.parse(Fecha2);                
-                if (rs.getLong("TotalRecibo") > 0){                    
-                    CuotaCobroSaldoCuo = rs.getLong("RucVenTot");
-                    if(rs.getLong("RucVenCam")>0){
-                        if(rs.getDouble("RucVenImp") == rs.getDouble("ReciboImpMe")){
-                            CuotaCobroSaldo = 0;
-                            CuotaCobroImp = rs.getLong("RucVenTot");
-                            CuotaCobroImpME = rs.getDouble("RucVenImp");
-                            CuotaCobroAju = rs.getDouble("ReciboImpMe");
-                            CuotaCobroSalImpMe = 0.0;
-                        }else{
-                            
-                        }
-                    }
-                    Connection con4 = ConexionDes.GetConnection(); 
-                    PreparedStatement stmlevel = con4.prepareStatement("INSERT INTO CUOTASCOBROLEVEL1 (CuotaCobroId,CuotaCobroLinea,CuotaCobroCon,CuotaCobroRetRen,CuotaCobroRetIva,CuotaCobroSaldoCuo,CuotaCobroFec,CuotaCobroSaldo,CuotaCobroMarcar,CuotaCobroImp,CuotaCobroVencimiento,CuotaCobroTipFactura,CuotaCobro2,CuotaCobro1,CuotaCobroCambio,CuotaCobroImpME,CuotaCobroMoneda,CuotaCobroCmp,CuotaCobroNroCanc,CuotaCobroComprom,CuotaCobroEstado,CuotaCobroAju,CuotaCobroSalImpMe,CuotaCobroFacCobId,CuotaCobroRetLey,CuotaCobroRecEst,CuotaCobroRecEmiId,CuotaCobroGrav,CuotaCobroOri,CuotaCobroMora,CuotaCobroMoraMe,CuotaCobroCobId,CuotaCobroNroNota,CuotaCobroIva05,CuotaCobroIva10,CuotaCobroGrav05,CuotaCobroGrav10,CuotaCobroExe,CuotaCobroIva05Me,CuotaCobroIva10Me,CuotaCobroGrav05Me,CuotaCobroGrav10Me,CuotaCobroExeMe,CuotaCobroFecRet,CuotaCobroNroLey,CuotaCobroFecLey,CuotaCobroMarcarRet,CuotaCobroNcME,CuotaCobroNcML,CuotaCobroRetIva05,CuotaCobroTCRet,CuotaCobroTipRenta,CuotaCobroTimbra,CuotaCobroEstMod,CuotaCobroIva,CuotaCobroImpNoGrav) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");                    
-                    stmlevel.setLong(1, IdUsar);
-                    stmlevel.setInt(2, 1);
-                    stmlevel.setString(3, "");
-                    stmlevel.setLong(4, 0);
-                    stmlevel.setLong(5, 0);
-                    stmlevel.setLong(6, CuotaCobroSaldoCuo); 
-                    stmlevel.setDate(7, rs.getDate("RucVenFec"));// new java.sql.Date(date.getTime())
-                    stmlevel.setLong(8, CuotaCobroSaldo);
-                    stmlevel.setInt(9, 0);
-                    stmlevel.setLong(10, CuotaCobroImp);
-                    stmlevel.setDate(11, rs.getDate("RucVenFec"));//new java.sql.Date(fecha1.getTime())
-                    //stmlevel.setString(11, anio + "-" + mes + "-" + dia);fecha1
-                    stmlevel.setString(12, rs.getString("RucVenTipCmp"));
-                    stmlevel.setInt(13, 1);
-                    stmlevel.setInt(14, 1);
-                    stmlevel.setLong(15, rs.getLong("RucVenCam"));
-                    stmlevel.setDouble(16, CuotaCobroImpME);
-                    stmlevel.setString(17, rs.getString("RucVenMon"));
-                    stmlevel.setString(18, rs.getString("RucVenNoFac")); 
-                    stmlevel.setInt(19, 0);
-                    stmlevel.setDate(20, rs.getDate("RucVenFec"));
-                    stmlevel.setInt(21, 0);
-                    stmlevel.setDouble(22, CuotaCobroAju);
-                    stmlevel.setDouble(23, CuotaCobroSalImpMe);
-                    stmlevel.setInt(24, 0);
-                    stmlevel.setInt(25, 0);
-                    stmlevel.setInt(26, 0);
-                    stmlevel.setInt(27, 0);
-                    stmlevel.setLong(28, 0);
-                    stmlevel.setString(29, "");
-                    stmlevel.setLong(30, 0);
-                    stmlevel.setInt(31, 0);
-                    stmlevel.setString(32, "");
-                    stmlevel.setLong(33, 0);
-                    stmlevel.setLong(34, 0);
-                    stmlevel.setLong(35, 0);
-                    stmlevel.setLong(36, 0);
-                    stmlevel.setLong(37, 0);
-                    stmlevel.setLong(38, 0);
-                    stmlevel.setLong(39, 0);
-                    stmlevel.setLong(40, 0);
-                    stmlevel.setLong(41, 0);
-                    stmlevel.setLong(42, 0);
-                    stmlevel.setLong(43, 0);
-                    stmlevel.setString(44, "1753-01-01");
-                    stmlevel.setString(45, "");
-                    stmlevel.setString(46, "1753-01-01");
-                    stmlevel.setInt(47, 0);
-                    stmlevel.setInt(48, 0);
-                    stmlevel.setLong(48, 0);
-                    stmlevel.setLong(49, 0);
-                    stmlevel.setLong(50, 0);
-                    stmlevel.setInt(51, 0);
-                    stmlevel.setLong(52, 0);
-                    stmlevel.setInt(53, 0);
-                    stmlevel.setLong(54, 0);
-                    stmlevel.setLong(55, 0);
-                    stmlevel.setLong(56, 0);
-                    stmlevel.execute();
-                    Proceso2CuotasCobroLevel ++;
-//                    Connection con5 = ConexionDes.GetConnection(); 
-//                    java.sql.Statement cm5 = con5.createStatement();
-//                    ResultSet rs3 = cm5.executeQuery("SELECT MAX(CuotaCobroId) AS IdUsar FROM CUOTASCOBRO");
-//                    while (rs3.next()) {
-//                        IdUsar = rs3.getLong("IdUsar");                    
-//                    }
-                    /////Id CobroCuota Recuperar
-                    ///Carga Recibos     
-                    Connection con52 = ConexionDes.GetConnection(); 
-                    java.sql.Statement cm52 = con52.createStatement();
-                    ResultSet rs32 = cm52.executeQuery("SELECT MAX(CobroId)+1 AS CobroId FROM COBROCUOTA");
-                    while (rs32.next()) {
-                        IdUsarCobro = rs32.getInt("CobroId");
-                        if(IdUsarCobro == 0){
-                            IdUsarCobro = 1;
-                        }
-                    }
-                    Connection con6 = ConexionDes.GetConnection(); 
-                    java.sql.Statement cm6 = con6.createStatement();
-                    PreparedStatement stmCC = con6.prepareStatement("INSERT INTO COBROCUOTA (CobroId,CobroEmp,SucId,SucEmp,CobroMoneda,CobroNroRecibo,CobroRucVenId,CobroCentro,CobroCanCuoNFac,CobroFecha,CobroUsr,CliId,CliEmp,CobroCambio,CobroImporte,CobroTotalFac,CobroAnticipo,CobroNotCre,CobroNeto,CobroRetRenta,CobroRetLey,CobroEfectivo,CobroEfeMe,CobroCheque,CobroCheMe,CobroCheCambio,CobroTarjeta,CobroRucVenta,CobroUs,CobroUsCambio,CobroPeso,CobroPesoCambio,CobroReal,CobroRealCambio,CobroEuro,CobroEuroCambio,CobroVuelto,CobroConcepto,CobroMonedaCheque,CobroEfeRecibido,CobroImpCuo,CobroCobId,CobroComis,CobroComisMe,CobroSucCliId,CobroRecEmiId,CobroMoraMe,CobroMora,CobroBanId,CobroTransfMe,CobroTransf,CobroTarjetaMe,CobroTransfNro,CobroNroRetLey,CobroNroRetRen,CobroNroRetIva,CobroFecRetLey,CobroFecRetRen,CobroFecRetIva,CobroGasBco,CobroGasBcoMe,CobroRetIVA05,CobroEstMig,CobroHora) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");                    
-                    stmCC.setLong(1, IdUsarCobro);
-                    stmCC.setString(2, rs.getString("RucVenEmp"));
-                    stmCC.setString(3, rs.getString("SucId"));
-                    stmCC.setString(4, rs.getString("SucEmp"));
-                    stmCC.setString(5, rs.getString("ReciboMon"));
-                    stmCC.setString(6, rs.getString("ReciboNro"));
-                    stmCC.setString(7, rs.getString("RucVenId"));
-                    stmCC.setString(8, rs.getString("RucVenCenCos"));
-                    stmCC.setLong(9, 0);
-                    stmCC.setDate(10, rs.getDate("ReciboFec"));
-                    stmCC.setInt(11, rs.getInt("ReciboUsr"));
-                    stmCC.setInt(12, rs.getInt("CliId"));
-                    stmCC.setString(13, rs.getString("CliEmp"));
-                    stmCC.setLong(14, rs.getLong("ReciboCam"));
-                    stmCC.setLong(15, rs.getLong("ReciboImpMe"));
-                    stmCC.setLong(16, rs.getLong("TotalRecibo"));   
-                    stmCC.setLong(17, 0);
-                    stmCC.setLong(18, 0);
-                    stmCC.setLong(19, rs.getLong("TotalRecibo"));       
-                    stmCC.setLong(20, 0);
-                    stmCC.setLong(21, 0);
-                    stmCC.setLong(22, rs.getLong("TotalRecibo"));
-                    stmCC.setLong(23, rs.getLong("ReciboImpMe"));
-                    stmCC.setLong(24, 0);
-                    stmCC.setLong(25, 0);
-                    stmCC.setLong(26, 0);
-                    stmCC.setLong(27, 0);
-                    stmCC.setLong(28, 0);
-                    stmCC.setLong(29, 0);
-                    stmCC.setLong(30, 0);
-                    stmCC.setLong(31, 0);
-                    stmCC.setLong(32, 0);
-                    stmCC.setLong(33, 0);
-                    stmCC.setLong(34, 0);
-                    stmCC.setLong(35, 0);
-                    stmCC.setLong(36, 0);
-                    stmCC.setLong(37, 0);
-                    stmCC.setString(38, rs.getString("ReciboObs"));
-                    stmCC.setLong(39, 0);
-                    stmCC.setLong(40, rs.getLong("TotalRecibo"));
-                    stmCC.setLong(41, rs.getLong("TotalRecibo"));
-                    stmCC.setLong(42, 0);
-                    stmCC.setLong(43, 0);
-                    stmCC.setLong(44, 0);
-                    stmCC.setLong(45, 0);
-                    stmCC.setLong(46, 0);
-                    stmCC.setLong(47, 0);
-                    stmCC.setInt(48, 0);
-                    stmCC.setLong(49, 0);
-                    stmCC.setLong(50, 0);
-                    stmCC.setLong(51, 0);
-                    stmCC.setLong(52, 0);
-                    stmCC.setLong(53, 0);
-                    stmCC.setLong(54, 0);
-                    stmCC.setLong(55, 0);
-                    stmCC.setLong(56, 0);
-                    stmCC.setString(57, "1753-01-01");
-                    stmCC.setString(58, "1753-01-01");
-                    stmCC.setString(59, "1753-01-01");
-                    stmCC.setLong(60, 0);
-                    stmCC.setLong(61, 0);
-                    stmCC.setLong(62, 0);
-                    stmCC.setLong(63, 0);            
-                    stmCC.setString(64, hours  + ":"+ minutes +":"+seconds);
-                    stmCC.execute();
-                    Proceso3CobroCuota ++;
-                    ///Carga Recibos
-                    ///Actualiza Numero de Cancelacion en CuotasCobroLelvel 1
-                    Connection con72 = ConexionDes.GetConnection();                    
-                    PreparedStatement stmGenAuxCom72 = con72.prepareStatement("Update CUOTASCOBROLEVEL1 set CuotaCobroNroCanc = ? Where CuotaCobroId = ?"); 
-                    stmGenAuxCom72.setLong(1, IdUsarCobro);
-                    stmGenAuxCom72.setLong(2, IdUsar);
-                    stmGenAuxCom72.execute();
-                    ///Actualiza Numero de Cancelacion en CuotasCobroLelvel 1
-                    ///Carga GenAuxCom
-                    Connection con7 = ConexionDes.GetConnection();
-                    java.sql.Statement cm7 = con7.createStatement();
-                    PreparedStatement stmGenAuxCom = con7.prepareStatement("INSERT INTO GENAUXCOM (GenAuxComSuc,GenAuxComCen,GenAuxComCta,GenAuxComFec,GenAuxComDeb,GenAuxComHab,GenAuxComCam,GenAuxComImp,GenAuxComDet,GenComAuxiliar,GenAuxComFecVen,GenAuxComCuotaId,GenAuxComNegId,GenAuxComCuota,GenAuxComOri) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");                    
-                    stmGenAuxCom.setString(1, rs.getString("RucVenTipCmp"));
-                    stmGenAuxCom.setString(2, "1/1");
-                    stmGenAuxCom.setString(3, rs.getString("RucVenEmp"));
-                    stmGenAuxCom.setDate(4, rs.getDate("RucVenFec"));
-                    stmGenAuxCom.setLong(5, rs.getLong("RucVenTot"));
-                    stmGenAuxCom.setLong(6, rs.getLong("TotalRecibo"));
-                    stmGenAuxCom.setLong(7, rs.getLong("ReciboCam"));
-                    stmGenAuxCom.setLong(8, rs.getLong("ReciboImpMe"));
-                    stmGenAuxCom.setString(9, rs.getString("RucVenNoFac"));
-                    stmGenAuxCom.setInt(10, IdUsarCobro);
-                    stmGenAuxCom.setDate(11, rs.getDate("RucVenPriVen"));
-                    stmGenAuxCom.setLong(12, IdUsar);
-                    stmGenAuxCom.setLong(13, 0);
-                    stmGenAuxCom.setLong(14, 0);
-                    stmGenAuxCom.setString(15, "");
-                    stmGenAuxCom.execute();
-                    Proceso4GenAuxCom ++;
-                    ///Carga GenAuxCom
-                }else{
-                    if(CanCuota == 1){
-                        CuotaCobroSaldoCuo = rs.getLong("RucVenTot");
-                        CuotaCobroImpME = rs.getDouble("RucVenImp");
-                        CuotaCobroAju = 0.0;
-                    }else{
+                Connection con = ConexionDes.GetConnection();
+                PreparedStatement psql=con.prepareStatement("DELETE FROM "+Conexion.conexiondesvar+".[dbo].[CUOTASCOBRO]\n" +
+                "INSERT INTO "+Conexion.conexiondesvar+".[dbo].[CUOTASCOBRO]\n" +
+                "([CuotaCobroUltNro],[CuotaCobroNroAnt],[CuotaCobroRucVenId],[CuotaCobroAntId],[SucId],[SucEmp],[CliId],[CliEmp]\n" +
+                ",[CuotaCobroUsr],[CuotaCobroEmp],[CuotaCobroCentro],[CuotaCobroIdRecha],[CuotaCobroPorCom],[CuotaCobroSuc],[CuotaCobroRecId]\n" +
+                ",[CobroCobId],[CuotaCobroZona],[CuotaCobroVenId],[CuotaCobroFacId],[CuotaCobroTCRet])\n" +
+                "SELECT 1, 0, RucVenId, 0, SucId, SucEmp, CliId, CliEmp\n" +
+                ", RucVenUsr, RucVenEmp, RucVenCenCos, 0, 0, '', 0\n" +
+                ", 0, 0, 0, 0, 0\n" +
+                "FROM "+Conexion.conexionorivar+".dbo.RUCVEN AS RE\n" +
+                "WHERE RucVenFmaPgo = 2\n" +
+                
+                "DELETE FROM "+Conexion.conexiondesvar+".[dbo].[CUOTASCOBROLEVEL1]\n" +
+                "INSERT INTO "+Conexion.conexiondesvar+".[dbo].[CUOTASCOBROLEVEL1]\n" +
+                "([CuotaCobroId],[CuotaCobroLinea],[CuotaCobroCon],[CuotaCobroRetRen],[CuotaCobroRetIva],[CuotaCobroSaldoCuo]\n" +
+                ",[CuotaCobroFec],[CuotaCobroSaldo],[CuotaCobroMarcar],[CuotaCobroImp],[CuotaCobroVencimiento],[CuotaCobroTipFactura]\n" +
+                ",[CuotaCobro2],[CuotaCobro1],[CuotaCobroCambio],[CuotaCobroImpME],[CuotaCobroMoneda],[CuotaCobroCmp]\n" +
+                ",[CuotaCobroNroCanc],[CuotaCobroComprom],[CuotaCobroEstado],[CuotaCobroAju],[CuotaCobroSalImpMe],[CuotaCobroFacCobId]\n" +
+                ",[CuotaCobroRetLey],[CuotaCobroRecEst],[CuotaCobroRecEmiId],[CuotaCobroGrav],[CuotaCobroOri],[CuotaCobroMora]           \n" +
+                ",[CuotaCobroMoraMe],[CuotaCobroCobId],[CuotaCobroNroNota],[CuotaCobroIva05],[CuotaCobroIva10],[CuotaCobroGrav05]           \n" +
+                ",[CuotaCobroGrav10],[CuotaCobroExe],[CuotaCobroIva05Me],[CuotaCobroIva10Me],[CuotaCobroGrav05Me],[CuotaCobroGrav10Me]           \n" +
+                ",[CuotaCobroExeMe],[CuotaCobroFecRet],[CuotaCobroNroLey],[CuotaCobroFecLey],[CuotaCobroMarcarRet],[CuotaCobroNcME]           \n" +
+                ",[CuotaCobroNcML],[CuotaCobroRetIva05],[CuotaCobroTCRet],[CuotaCobroTipRenta],[CuotaCobroTimbra],[CuotaCobroEstMod]           \n" +
+                ",[CuotaCobroIva],[CuotaCobroImpNoGrav],[CuotaCobroCuota],[CuotaCobroIrpGDC])\n" +
+                "SELECT \n" +
+                "CCL1.CuotaCobroId, 1, '', 0, 0, RucVenTot,\n" +
+                "RucVenFec, RucVenTot, 0, RucVenTot, RucVenFec, RucVenTipCmp, \n" +
+                "1, 1, RucvenCam, RucVenImp, RucVenMon, RucVenNoFac, \n" +
+                "0, RucVenFec, 0, 0, 0, 0,\n" +
+                "0, 0, 0, 0, '', 0,\n" +
+                "0, 0, 0, 0, 0, 0,\n" +
+                "0, 0, 0, 0, 0, 0,\n" +
+                "0, 0, 0, 0, 0, 0,\n" +
+                "0, 0, 0, 0, 0, 0,\n" +
+                "0, 0, 0, 0\n" +
+                "FROM "+Conexion.conexionorivar+".[dbo].RUCVEN RV\n" +
+                "INNER JOIN "+Conexion.conexiondesvar+".[dbo].[CUOTASCOBRO] AS CCL1 ON CCL1.CuotaCobroRucVenId = RV.RucVenId AND CCL1.CuotaCobroEmp = RV.RucVenEmp\n" +
+                "WHERE RucVenFmaPgo = 2\n" +
                         
-                    }
-                    for (int j = 1; j <= CanCuota; j++) {
-                        mes++;
-                        if(mes > 12){mes = 1;Ban++; Ban2 = 1;}
-                        if (Ban2 == 1){anio += Ban;}  
-                        Connection con6 = ConexionDes.GetConnection(); 
-                        java.sql.Statement cm6 = con6.createStatement();
-                        PreparedStatement stmlevel = con6.prepareStatement("INSERT INTO CUOTASCOBROLEVEL1 (CuotaCobroId,CuotaCobroLinea,CuotaCobroCon,CuotaCobroRetRen,CuotaCobroRetIva,CuotaCobroSaldoCuo,CuotaCobroFec,CuotaCobroSaldo,CuotaCobroMarcar,CuotaCobroImp,CuotaCobroVencimiento,CuotaCobroTipFactura,CuotaCobro2,CuotaCobro1,CuotaCobroCambio,CuotaCobroImpME,CuotaCobroMoneda,CuotaCobroCmp,CuotaCobroNroCanc,CuotaCobroComprom,CuotaCobroEstado,CuotaCobroAju,CuotaCobroSalImpMe,CuotaCobroFacCobId,CuotaCobroRetLey,CuotaCobroRecEst,CuotaCobroRecEmiId,CuotaCobroGrav,CuotaCobroOri,CuotaCobroMora,CuotaCobroMoraMe,CuotaCobroCobId,CuotaCobroNroNota,CuotaCobroIva05,CuotaCobroIva10,CuotaCobroGrav05,CuotaCobroGrav10,CuotaCobroExe,CuotaCobroIva05Me,CuotaCobroIva10Me,CuotaCobroGrav05Me,CuotaCobroGrav10Me,CuotaCobroExeMe,CuotaCobroFecRet,CuotaCobroNroLey,CuotaCobroFecLey,CuotaCobroMarcarRet,CuotaCobroNcME,CuotaCobroNcML,CuotaCobroRetIva05,CuotaCobroTCRet,CuotaCobroTipRenta,CuotaCobroTimbra,CuotaCobroEstMod,CuotaCobroIva,CuotaCobroImpNoGrav) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");                        
-                        stmlevel.setLong(1, IdUsar);
-                        stmlevel.setInt(2, j);
-                        stmlevel.setString(3, "");
-                        stmlevel.setLong(4, 0);
-                        stmlevel.setLong(5, 0);
-                        stmlevel.setLong(6, CuotaCobroSaldoCuo);
-                        stmlevel.setDate(7, rs.getDate("RucVenFec"));
-                        stmlevel.setLong(8, CuotaCobroSaldoCuo);
-                        stmlevel.setInt(9, 0);
-                        stmlevel.setLong(10, 0);
-                        stmlevel.setDate(11, new java.sql.Date(date2.getTime()));//rs.getDate("RucVenFec")//anio + "-" + mes + "-" + dia
-                        stmlevel.setString(12, rs.getString("RucVenTipCmp"));  
-                        stmlevel.setInt(13, CanCuota);
-                        stmlevel.setInt(14, j);
-                        stmlevel.setLong(15, rs.getLong("RucVenCam"));
-                        stmlevel.setDouble(16, CuotaCobroImpME);
-                        stmlevel.setString(17, rs.getString("RucVenMon"));
-                        stmlevel.setString(18, rs.getString("RucVenNoFac")); 
-                        stmlevel.setInt(19, 0);
-                        stmlevel.setDate(20, new java.sql.Date(date2.getTime()));//rs.getDate("RucVenFec")//anio + "-" + mes + "-" + dia
-                        stmlevel.setInt(21, 0);
-                        stmlevel.setDouble(22, CuotaCobroAju);
-                        stmlevel.setDouble(23, CuotaCobroImpME);
-                        stmlevel.setInt(24, 0);
-                        stmlevel.setInt(25, 0);
-                        stmlevel.setInt(26, 0);
-                        stmlevel.setInt(27, 0);
-                        stmlevel.setLong(28, 0);
-                        stmlevel.setString(29, "");    
-                        stmlevel.setLong(30, 0);
-                        stmlevel.setInt(31, 0);
-                        stmlevel.setString(32, "");
-                        stmlevel.setLong(33, 0);
-                        stmlevel.setLong(34, 0);
-                        stmlevel.setLong(35, 0);
-                        stmlevel.setLong(36, 0);
-                        stmlevel.setLong(37, 0);
-                        stmlevel.setLong(38, 0);
-                        stmlevel.setLong(39, 0);
-                        stmlevel.setLong(40, 0);
-                        stmlevel.setLong(41, 0);
-                        stmlevel.setLong(42, 0);
-                        stmlevel.setLong(43, 0);
-                        stmlevel.setString(44, "1753-01-01");
-                        stmlevel.setString(45, "");
-                        stmlevel.setString(46, "1753-01-01");
-                        stmlevel.setInt(47, 0);
-                        stmlevel.setInt(48, 0);
-                        stmlevel.setLong(48, 0);
-                        stmlevel.setLong(49, 0);
-                        stmlevel.setLong(50, 0);
-                        stmlevel.setInt(51, 0);
-                        stmlevel.setLong(52, 0);
-                        stmlevel.setInt(53, 0);
-                        stmlevel.setLong(54, 0);
-                        stmlevel.setLong(55, 0);
-                        stmlevel.setLong(56, 0);
-                        stmlevel.execute();
-                        Proceso2CuotasCobroLevel ++;
-                        Ban2 = 0;                        
-                    }
-                }
-            }
+                "DELETE FROM "+Conexion.conexiondesvar+".[dbo].[COBROCUOTA]\n" +
+                "INSERT INTO "+Conexion.conexiondesvar+".[dbo].[COBROCUOTA]\n" +
+                "([CobroId]\n" +
+                ",[CobroEmp],[SucId],[SucEmp],[CobroMoneda],[CobroNroRecibo],[CobroRucVenId],[CobroCentro],[CobroCanCuoNFac],[CobroFecha]\n" +
+                ",[CobroUsr]\n" +
+                ",[CliId],[CliEmp],[CobroCambio],[CobroImporte],[CobroTotalFac],[CobroAnticipo],[CobroNotCre],[CobroNeto],[CobroRetIVA]\n" +
+                ",[CobroRetRenta],[CobroRetLey],[CobroNroCtr],[CobroEfectivo],[CobroEfeME],[CobroCheque],[CobroCheME],[CobroCheCambio]\n" +
+                ",[CobroTarjeta],[CobroRucVenta],[CobroUS],[CobroUSCambio],[CobroPeso],[CobroPesoCambio],[CobroReal]\n" +
+                ",[CobroRealCambio],[CobroEuro],[CobroEuroCambio],[CobroVuelto],[CobroConcepto],[CobroMonedaCheque],[CobroHora]\n" +
+                ",[CobroEfeRecibido],[CobroImpCuo],[CobroCobId],[CobroComis],[CobroComisMe],[CobroSucCliId],[CobroRecEmiId],[CobroMoraMe]\n" +
+                ",[CobroMora],[CobroBanId],[CobroTransfMe],[CobroTransf],[CobroTarjetaMe],[CobroTransfNro],[CobroNroRetLey],[CobroNroRetRen]\n" +
+                ",[CobroNroRetIva],[CobroFecRetLey],[CobroFecRetRen],[CobroFecRetIva],[CobroGasBco],[CobroGasBcoMe],[CobroRetIVA05]\n" +
+                ",[CobroEstMig])\n" +
+                "SELECT \n" +
+                "ReciboNro\n" +
+                ", ReciboEmp, SucId, RucVenEmp, ReciboMon, ReciboNro, RucVenId, RucVenCenCos, 0, ReciboFec\n" +
+                ", ReciboUsr\n" +
+                ", CliId, RucVenEmp, ReciboCam, ReciboImpMe, ReciboImp, 0, 0, ReciboImp, 0\n" +
+                ", 0, 0, 0, ReciboImp, ReciboImpMe, 0, 0, 0\n" +
+                ", 0, 0, 0, 0, 0, 0, 0 \n" +
+                ", 0, 0, 0, 0, ReciboObs, 0, 0 \n" +
+                ", ReciboImp, ReciboImp, 0, 0, 0, 0, 0, 0\n" +
+                ", 0, 0, 0, 0, 0, 0, 0, 0\n" +
+                ", 0, 0, 0, 0, 0, 0, 0, \n" +
+                "0\n" +
+                "FROM "+Conexion.conexionorivar+".dbo.RECIBO AS RE\n" +
+                "INNER JOIN "+Conexion.conexionorivar+".dbo.RUCVEN AS RV ON RV.RucVenId = RE.ReciboRucVenId AND RV.RucVenEmp = RE.ReciboEmp\n" +
+                        
+                "DELETE FROM "+Conexion.conexiondesvar+".[dbo].[GENAUXCOM]\n" +
+                "INSERT INTO "+Conexion.conexiondesvar+".[dbo].[GENAUXCOM]\n" +
+                "([GenAuxComSuc],[GenAuxComCen],[GenAuxComCta],[GenAuxComFec],[GenAuxComDeb],[GenAuxComHab],[GenAuxComCam]\n" +
+                ",[GenAuxComImp],[GenAuxComDet],[GenComAuxiliar],[GenAuxComFecVen],[GenAuxComCuotaId],[GenAuxComNegId],[xx],[GenAuxComCuota],\n" +
+                "[GenAuxComOri],[GenAuxComNroIden],[GenAuxComNroLin])\n" +
+                "SELECT RucVenTipCmp, '1/1', RucVenEmp, RucVenFec, RucVenTot, ReciboImp, ReciboCam\n" +
+                ", ReciboImpMe, RucVenNoFac, ReciboNro, RucVenFec, 0, 0, 0, 0\n" +
+                ", '', 0,0\n" +
+                "FROM "+Conexion.conexionorivar+".dbo.RECIBO AS RE\n" +
+                "INNER JOIN "+Conexion.conexionorivar+".dbo.RUCVEN AS RV ON RV.RucVenId = RE.ReciboRucVenId AND RV.RucVenEmp = RE.ReciboEmp\n" +
+                
+                "Update GAC\n" +
+                "Set GAC.GenAuxComCuotaId = CC.CuotaCobroId\n" +
+                "From GENAUXCOM As GAC\n" +
+                "Inner Join CUOTASCOBROLEVEL1 As CCL1 On GAC.GenAuxComDet = CCL1.CuotaCobroCmp\n" +
+                "Inner join CUOTASCOBRO As CC On CCL1.CuotaCobroId = CC.CuotaCobroId And CC.SucEmp = GAC.GenAuxComCta\n" +
+                
+                "Update CCL1\n" +
+                "Set CCL1.CuotaCobroSaldo = CCL1.CuotaCobroSaldo - GAC.GenAuxComHab, CCL1.CuotaCobroMarcar = 1, \n" +
+                "CuotaCobroImp = CuotaCobroImp - GAC.GenAuxComHab\n" +
+                "From CUOTASCOBROLEVEL1 As CCL1\n" +
+                "INNER JOIN GENAUXCOM AS GAC ON GAC.GenAuxComDet = CCL1.CuotaCobroCmp\n" +
+                "INNER JOIN CUOTASCOBRO AS CC ON CC.CuotaCobroId = CCL1.CuotaCobroId AND GAC.GenAuxComCta = CC.CuotaCobroEmp");
+                psql.execute();
+                psql.close();
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(null, ex, "Error"+ex.getMessage(), JOptionPane.ERROR_MESSAGE);
+            Proceso = "Problemas en el Proceso. Migracion de  Cobros y Generacion de Cuotas no Realizada";
         }
-        if(Proceso1CuotasCobro>0){
-            Proceso = "Migrar Cobros y Generar Cuotas: Fueron Insertadas " + Proceso1CuotasCobro + " registros en CUOTASCOBRO";
-            selectcount = Proceso1CuotasCobro;
-            CargarGrid();
-        }
-        if(Proceso2CuotasCobroLevel>0){
-            Proceso = "Migrar Cobros y Generar Cuotas: Fueron Insertadas " + Proceso2CuotasCobroLevel + " registros en CUOTASCOBROLEVEL1";
-            selectcount = Proceso1CuotasCobro;
-            CargarGrid();            
-        }
-        if(Proceso3CobroCuota>0){
-            Proceso = "Migrar Cobros y Generar Cuotas: Fueron Insertadas " + Proceso3CobroCuota + " registros en COBROCUOTAS";
-            selectcount = Proceso3CobroCuota;
-            CargarGrid();                        
-        }
-        if(Proceso4GenAuxCom>0){
-            Proceso = "Migrar Cobros y Generar Cuotas: Fueron Insertadas " + Proceso4GenAuxCom + " registros en GENAUXCOM";
-            selectcount = Proceso4GenAuxCom;
-            CargarGrid();            
-        }
+        CargarGrid();        
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        Proceso = "Migracion de Ganacia Capital Realizada Con Exito";
+        try {
+                Connection con = ConexionDes.GetConnection();
+                PreparedStatement psql=con.prepareStatement("DELETE FROM "+Conexion.conexiondesvar+".dbo.VENIRP INSERT INTO "+Conexion.conexiondesvar+".dbo.VENIRP (VenIrpId, VenIrpRucVenId, VenIrpEmp, VenIrpBieId, VenIrpImp, VenIrpTip)\n" +
+                "Select VenIrpId, VenIrpRucVenId, VenIrpEmp, \n" +
+                "Case \n" +
+                "  When VenIrpBieId = 1 Then 1 \n" +
+                "  When VenIrpBieId = 2 Then 5\n" +
+                "  When VenIrpBieId = 3 Then 2\n" +
+                "  When VenIrpBieId = 4 Then 3\n" +
+                "  When VenIrpBieId = 5 Then 4\n" +
+                "  When VenIrpBieId = 6 Then 6\n" +
+                "  When VenIrpBieId = 7 Then 7\n" +
+                "  When VenIrpBieId = 8 Then 8\n" +
+                "  When VenIrpBieId = 9 Then 10\n" +
+                "  When VenIrpBieId = 10 Then 11\n" +
+                "  When VenIrpBieId = 11 Then 12\n" +
+                "  When VenIrpBieId = 12 Then 13\n" +
+                "  When VenIrpBieId = 13 Then 14\n" +
+                "  When VenIrpBieId = 14 Then 15\n" +
+                "  When VenIrpBieId = 15 Then 16\n" +
+                "End as VenIrpBieId,\n" +
+                "VenIrpImp, VenIrpTip  \n" +
+                "From "+Conexion.conexionorivar+".dbo.VENIRP");
+                psql.execute();
+                psql.close();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, ex, "Error"+ex.getMessage(), JOptionPane.ERROR_MESSAGE);
+            Proceso = "Problemas en el Proceso. Migracion de Ganancia Capital no Realizada";
+        }
+        CargarGrid();        
+    }//GEN-LAST:event_jButton3ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
     // End of variables declaration//GEN-END:variables
